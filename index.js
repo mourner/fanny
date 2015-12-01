@@ -1,6 +1,6 @@
 'use strict';
 
-var ndarray = require('ndarray');
+var ndarray2d = require('./ndarray2d');
 
 module.exports = network;
 
@@ -14,7 +14,7 @@ function network(data, inputSize, hiddenSize, outputSize, alpha) {
     var l0 = createInputLayer(data, rows, cols, inputSize);
     var l1 = createLayer(rows, hiddenSize);
     var l2 = createLayer(rows, outputSize);
-    var y = ndarray(data, [rows, outputSize], [cols, 1], inputSize);
+    var y = ndarray2d(data, rows, outputSize, cols, 1, inputSize);
 
     for (var i = 0; i <= 60000; i++) {
         feedforward(l1, l0, syn0);
@@ -56,21 +56,19 @@ function feedforward(output, input, synapse) {
 }
 
 function createLayer(rows, cols) {
-    var shape = [rows, cols];
-
     var obj = {};
-    obj.values = ndarray(new Float32Array(rows * cols), shape);
-    obj.error = ndarray(new Float32Array(rows * cols), shape);
-    obj.delta = ndarray(new Float32Array(rows * cols), shape);
-    obj.transposed = obj.values.transpose(1, 0);
+    obj.values = ndarray2d(new Float32Array(rows * cols), rows, cols);
+    obj.error = ndarray2d(new Float32Array(rows * cols), rows, cols);
+    obj.delta = ndarray2d(new Float32Array(rows * cols), rows, cols);
+    obj.transposed = obj.values.transpose();
 
     return obj;
 }
 
 function createInputLayer(data, rows, cols, inputSize) {
     var obj = {};
-    obj.values = ndarray(data, [rows, inputSize], [cols, 1]);
-    obj.transposed = obj.values.transpose(1, 0);
+    obj.values = ndarray2d(data, rows, inputSize, rows, cols, 1);
+    obj.transposed = obj.values.transpose();
     return obj;
 }
 
@@ -78,9 +76,9 @@ function createSynapse(rows, cols) {
     var shape = [rows, cols];
 
     var obj = {};
-    obj.values = ndarray(new Float32Array(rows * cols), shape);
-    obj.delta = ndarray(new Float32Array(rows * cols), shape);
-    obj.transposed = obj.values.transpose(1, 0);
+    obj.values = ndarray2d(new Float32Array(rows * cols), rows, cols);
+    obj.delta = ndarray2d(new Float32Array(rows * cols), rows, cols);
+    obj.transposed = obj.values.transpose();
 
     for (var i = 0; i < obj.values.data.length; i++) {
         obj.values.data[i] = Math.random() * 2 - 1;
@@ -95,10 +93,10 @@ function sub(out, a, b) {
 }
 
 function dotProduct(out, a, b) {
-    for (var i = 0; i < a.shape[0]; i++) {
-        for (var j = 0; j < b.shape[1]; j++) {
+    for (var i = 0; i < a.rows; i++) {
+        for (var j = 0; j < b.cols; j++) {
             var sum = 0;
-            for (var k = 0; k < a.shape[1]; k++) {
+            for (var k = 0; k < a.cols; k++) {
                 sum += a.get(i, k) * b.get(k, j);
             }
             out.set(i, j, sum);
