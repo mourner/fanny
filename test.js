@@ -2,15 +2,17 @@
 
 var network = require('./');
 
-var data = [
-    0, 0, 1, 0,
-    0, 1, 1, 1,
-    1, 0, 1, 1,
-    1, 1, 1, 0
+var input = [
+    0, 0,
+    0, 1,
+    1, 0,
+    1, 1,
 ];
+
+var output = [0, 1, 1, 0];
 
 console.time('training');
 
-network(data, 3, 3, 1, 10);
+network(input, output, 4, 4, 1);
 
 console.timeEnd('training');
