@@ -2,8 +2,8 @@
 
 module.exports = ndarray2d;
 
-function ndarray2d(data, rows, cols) {
-    return new NDArray2D(data, rows, cols);
+function ndarray2d(data, rows, cols, stride0, stride1, offset) {
+    return new NDArray2D(data, rows, cols, stride0, stride1, offset);
 }
 
 function NDArray2D(data, rows, cols, stride0, stride1, offset) {
@@ -51,9 +51,34 @@ NDArray2D.prototype = {
         return this;
     },
 
-    sigmoid: function (a) {
+    subeq: function (b) {
+        return this.sub(this, b);
+    },
+
+    sigmoideq: function () {
         for (var i = 0; i < this.data.length; i++) {
-            this.data[i] = 1 / (1 + Math.exp(-a.data[i]));
+            this.data[i] = 1 / (1 + Math.exp(-this.data[i]));
+        }
+        return this;
+    },
+
+    dsigmoid: function (sigm) {
+        for (var i = 0; i < this.data.length; i++) {
+            this.data[i] = sigm.data[i] * (1 - sigm.data[i]);
+        }
+        return this;
+    },
+
+    muleq: function (a) {
+        for (var i = 0; i < this.data.length; i++) {
+            this.data[i] *= a.data[i];
+        }
+        return this;
+    },
+
+    mulseq: function (s) {
+        for (var i = 0; i < this.data.length; i++) {
+            this.data[i] *= s;
         }
         return this;
     },
@@ -72,5 +97,16 @@ NDArray2D.prototype = {
             sum += Math.pow(this.data[i], 2);
         }
         return sum / this.data.length;
+    },
+
+    toString: function () {
+        var str = '';
+        for (var i = 0; i < this.rows; i++) {
+            for (var j = 0; j < this.cols; j++) {
+                str += this.get(i, j) + ' ';
+            }
+            str += '\n';
+        }
+        return str;
     }
 };

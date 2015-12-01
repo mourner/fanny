@@ -17,33 +17,19 @@ function network(data, inputSize, hiddenSize, outputSize, alpha) {
     var y = ndarray2d(data, rows, outputSize, cols, 1, inputSize);
 
     for (var i = 0; i <= 60000; i++) {
-        l1.values.product(l0.values, syn0.values).sigmoid(l1.values);
-        l2.values.product(l1.values, syn1.values).sigmoid(l2.values);
+        l1.values.product(l0.values, syn0.values).sigmoideq();
+        l2.values.product(l1.values, syn1.values).sigmoideq();
 
         l2.error.sub(l2.values, y);
-        updateDelta(l2);
+        l2.delta.dsigmoid(l2.values).muleq(l2.error);
 
         l1.error.product(l2.delta, syn1.t);
-        updateDelta(l1);
+        l1.delta.dsigmoid(l1.values).muleq(l1.error);
 
-        updateWeights(syn1, l1, l2, alpha);
-        updateWeights(syn0, l0, l1, alpha);
+        syn1.values.subeq(syn1.delta.product(l1.t, l2.delta).mulseq(alpha || 1));
+        syn0.values.subeq(syn0.delta.product(l0.t, l1.delta).mulseq(alpha || 1));
 
         if (i % 5000 === 0) console.log('err ' + i + ': ' + l2.error.mean());
-    }
-}
-
-function updateWeights(synapse, layer1, layer2, alpha) {
-    synapse.delta.product(layer1.t, layer2.delta);
-
-    for (var i = 0; i < synapse.delta.data.length; i++) {
-        synapse.values.data[i] -= (alpha || 1) * synapse.delta.data[i];
-    }
-}
-
-function updateDelta(a) {
-    for (var i = 0, values = a.values.data; i < values.length; i++) {
-        a.delta.data[i] = values[i] * (1 - values[i]) * a.error.data[i];
     }
 }
 
@@ -58,15 +44,15 @@ function createLayer(rows, cols) {
 
 function createInputLayer(data, rows, cols, inputSize) {
     var obj = {};
-    obj.values = ndarray2d(data, rows, inputSize, rows, cols, 1);
+    obj.values = ndarray2d(data, rows, inputSize, cols);
     obj.t = obj.values.transpose();
     return obj;
 }
 
 function createSynapse(rows, cols) {
     var obj = {};
-    obj.values = ndarray2d(new Float32Array(rows * cols), rows, cols).random(-1, 1);
-    obj.delta = ndarray2d(new Float32Array(rows * cols), rows, cols);
+    obj.values = ndarray2d(new Float32Array(rows * cols), rows).random(-1, 1);
+    obj.delta = ndarray2d(new Float32Array(rows * cols), rows);
     obj.t = obj.values.transpose();
     return obj;
 }
