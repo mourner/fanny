@@ -77,6 +77,7 @@ NDArray2D.prototype = {
     },
 
     mulseq: function (s) {
+        if (s === 1) return this;
         for (var i = 0; i < this.data.length; i++) {
             this.data[i] *= s;
         }
