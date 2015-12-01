@@ -11,6 +11,6 @@ var data = [
 
 console.time('training');
 
-network(data, 3, 4, 1);
+network(data, 3, 3, 1, 10);
 
 console.timeEnd('training');

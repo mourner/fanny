@@ -5,7 +5,7 @@ var ops = require('ndarray-ops');
 
 module.exports = network;
 
-function network(data, input, hidden, output) {
+function network(data, input, hidden, output, alpha) {
     var size = input + output;
     var rows = data.length / size;
 
@@ -32,17 +32,17 @@ function network(data, input, hidden, output) {
     var l2e = matrix2d(rows, output);
     var l2d = matrix2d(rows, output);
 
-    for (var i = 0; i < 60000; i++) {
+    for (var i = 0; i <= 60000; i++) {
         sigmoid(l1, dotProduct(l1, x, syn0));
         sigmoid(l2, dotProduct(l2, l1, syn1));
 
-        ops.muleq(sigmoidDeriv(l2d, l2), ops.sub(l2e, y, l2));
-        if (i % 5000 === 0) console.log(mean(l2e));
+        ops.muleq(sigmoidDeriv(l2d, l2), ops.sub(l2e, l2, y));
+        if (i % 5000 === 0) console.log('err ' + i + ': ' + mean(l2e));
 
         ops.muleq(sigmoidDeriv(l1d, l1), dotProduct(l1e, l2d, syn1t));
 
-        ops.addeq(syn1, dotProduct(syn1d, l1t, l2d));
-        ops.addeq(syn0, dotProduct(syn0d, xt, l1d));
+        ops.subeq(syn1, ops.mulseq(dotProduct(syn1d, l1t, l2d), alpha));
+        ops.subeq(syn0, ops.mulseq(dotProduct(syn0d, xt, l1d), alpha));
     }
 
     logND(l2);
