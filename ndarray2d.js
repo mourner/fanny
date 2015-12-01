@@ -45,8 +45,10 @@ NDArray2D.prototype = {
     },
 
     sub: function (a, b) {
-        for (var i = 0; i < this.data.length; i++) {
-            this.data[i] = a.data[i] - b.data[i];
+        for (var i = 0; i < this.rows; i++) {
+            for (var j = 0; j < this.cols; j++) {
+                this.set(i, j, a.get(i, j) - b.get(i, j));
+            }
         }
         return this;
     },
@@ -70,8 +72,10 @@ NDArray2D.prototype = {
     },
 
     muleq: function (a) {
-        for (var i = 0; i < this.data.length; i++) {
-            this.data[i] *= a.data[i];
+        for (var i = 0; i < this.rows; i++) {
+            for (var j = 0; j < this.cols; j++) {
+                this.set(i, j, this.get(i, j) * a.get(i, j));
+            }
         }
         return this;
     },
