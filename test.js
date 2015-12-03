@@ -2,12 +2,12 @@
 
 var network = require('./');
 
-var data = [
+var data = new Float32Array([
     0, 0, 0,
     0, 1, 1,
     1, 0, 1,
     1, 1, 0,
-];
+]);
 
 console.time('training');
 
